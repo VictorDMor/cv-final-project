@@ -1,7 +1,6 @@
 import cv2
 import argparse
 import numpy as np
-import pytesseract
 from utils import show_image, color_to_image_proportion
 
 parser = argparse.ArgumentParser(description='Camera type detection')

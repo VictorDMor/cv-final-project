@@ -19,3 +19,25 @@ def color_to_image_proportion(img, color):
 def show_image(img, window_title='Window'):
     cv2.imshow(window_title, img)
     cv2.waitKey(0)
+
+def detect_scoreboard(image):
+    # 1. Cut frames to the top left
+    width = image.shape[1]
+    height = image.shape[0]
+    x_cut_percentage = 0.40
+    y_cut_percentage = 0.125
+    image = image[10:int(height*y_cut_percentage), 10:int(width*x_cut_percentage)]
+    scoreboard = False
+
+    gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray,50,150,apertureSize = 3)
+
+    lines = cv2.HoughLines(edges,1,np.pi/180,100)
+    scoreboard = True if lines is not None else False
+    image = cv2.putText(image, '{}'.format(scoreboard), (int(image.shape[1] * 0.85), int(image.shape[0] * 0.92)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), thickness=2)
+
+    # blur = cv2.GaussianBlur(image,(5, 5),0)
+    # edges = cv2.Canny(blur, int(255/3), 255)
+    # images = np.hstack((image, edges))
+    show_image(image)
+    
