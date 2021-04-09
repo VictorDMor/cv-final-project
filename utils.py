@@ -1,3 +1,4 @@
+from constants import COLOR_BOUNDARIES
 import cv2
 import numpy as np
 
@@ -15,6 +16,11 @@ def color_to_image_proportion(img, color):
     pixels_amount = img[mask > 0].shape[0]
     proportion = pixels_amount/(img.shape[0] * img.shape[1])
     return proportion
+
+def convert_to_hsv(color):
+    bgr = np.uint8([[color]])
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+    return hsv[0][0]
     
 def show_image(img, window_title='Window'):
     cv2.imshow(window_title, img)
@@ -40,4 +46,6 @@ def detect_scoreboard(image):
     # edges = cv2.Canny(blur, int(255/3), 255)
     # images = np.hstack((image, edges))
     show_image(image)
-    
+
+def apply_mask(image, color):
+    return cv2.inRange(image, np.array(COLOR_BOUNDARIES[color][0]), np.array(COLOR_BOUNDARIES[color][1]))
