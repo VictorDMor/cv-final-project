@@ -1,7 +1,7 @@
 import cv2
 import argparse
 import numpy as np
-from utils import show_image, color_to_image_proportion
+from utils import detect_scoreboard, show_image, color_to_image_proportion
 
 parser = argparse.ArgumentParser(description='Camera type detection')
 parser.add_argument('--image_path', type=str, help='Path for a custom image that you might want to use')
@@ -16,7 +16,13 @@ else:
 
 print('Reading and showing the original image...')
 img = cv2.imread(path)
-show_image(img,'Football play image - ORIGINAL')
+
+# has_scoreboard = detect_scoreboard(img)
+
+# if has_scoreboard:
+#     print('A scoreboard is present on this image!')
+# else:
+#     print('There\'s no scoreboard in this image')
 
 print('=' * 80)
 cut_percentage = 0.30
@@ -27,8 +33,6 @@ print('Image size is {} x {} pixels'.format(img_width, img_height))
 
 field_height_cut = int(img_height * cut_percentage)
 field_region = img[field_height_cut:][:]
-
-show_image(field_region, 'Field region')
 
 print('=' * 80)
 print('Now, we are going to check the amount of green color in the image, it is likely to be an open camera shot if the green color predominates.')
@@ -42,6 +46,9 @@ print('Proportion of skin color in the image is of {}%.'.format(proportion_of_sk
 
 print('=' * 80)
 if proportion_of_green < 50 and proportion_of_skin > 5:
-    print('It\'s a closed camera shot')
+    message = 'Closed camera shot'
 else:
-    print('It\'s an open camera shot')
+    message = 'Open camera shot'
+
+img = cv2.putText(img, '{}'.format(message), (int(img.shape[1] * 0.7), int(img.shape[0] * 0.9)), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), thickness=4, )
+show_image(img)

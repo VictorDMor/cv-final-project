@@ -47,5 +47,8 @@ def detect_scoreboard(image):
     # images = np.hstack((image, edges))
     show_image(image)
 
-def apply_mask(image, color):
-    return cv2.inRange(image, np.array(COLOR_BOUNDARIES[color][0]), np.array(COLOR_BOUNDARIES[color][1]))
+def apply_teams_mask(image, color_1, color_2):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    mask_1 = cv2.inRange(hsv, np.array(COLOR_BOUNDARIES[color_1][0]), np.array(COLOR_BOUNDARIES[color_1][1]))
+    mask_2 = cv2.inRange(hsv, np.array(COLOR_BOUNDARIES[color_2][0]), np.array(COLOR_BOUNDARIES[color_2][1]))
+    return cv2.bitwise_or(mask_1, mask_2)
