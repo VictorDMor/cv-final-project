@@ -1,0 +1,3 @@
+We need SORT algorithm
+Visual Studio Build Tools 2019
+yolo_3.weights is on Drive
