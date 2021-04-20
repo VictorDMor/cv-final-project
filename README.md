@@ -14,3 +14,7 @@ Many arguments are used to debug, such as:
 * --start_from: Frame number to start from, for debugging
 * --end_at: Frame number to end at, for debugging
 * --track_players: Enable player tracking with YoloV3 and OpenCV DNN
+
+You will need OpenCV, Matplotlib and Numpy installed in your machine. If you want to track the players, you are going to need
+the yolov3.weights file, with the network's weights: https://pjreddie.com/media/files/yolov3.weights
+
