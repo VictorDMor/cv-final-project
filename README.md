@@ -21,3 +21,5 @@ the yolov3.weights file, with the network's weights: https://pjreddie.com/media/
 For saving the video, you might need a video codec so OpenCV can write to it. For Windows, you can download the openh264-1.8.0-win64.dll at https://github.com/cisco/openh264/tree/v1.8.0
 
 For Mac, no codecs are needed. I don't know about Linux.
+
+Create the "tmp" folder so the videos can be outputted.
