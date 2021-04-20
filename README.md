@@ -18,3 +18,6 @@ Many arguments are used to debug, such as:
 You will need OpenCV, Matplotlib and Numpy installed in your machine. If you want to track the players, you are going to need
 the yolov3.weights file, with the network's weights: https://pjreddie.com/media/files/yolov3.weights
 
+For saving the video, you might need a video codec so OpenCV can write to it. For Windows, you can download the openh264-1.8.0-win64.dll at https://github.com/cisco/openh264/tree/v1.8.0
+
+For Mac, no codecs are needed. I don't know about Linux.
