@@ -3631,4 +3631,37 @@ True,
 True,
 True,
 True,
+True,
 True]
+
+TRANSCRIPTION = [
+    {
+        'from': 1,
+        'to': 139
+    },
+    {
+        'from': 1358,
+        'to': 1721
+    },
+    {
+        'from': 2026,
+        'to': 2510
+    },
+    {
+        'from': 2782,
+        'to': 2937
+    }
+]
+
+REPLAY_TRANSCRIPTION = [
+    {
+        'from': 378,
+        'to': 728
+    },
+    {
+        'from': 3054,
+        'to': 3626
+    }
+]
+
+REPLAY_FRAMES = 922

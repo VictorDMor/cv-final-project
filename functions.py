@@ -79,6 +79,8 @@ def player_detection(img, net, classes, colors, layer_names):
             (x, y) = (boxes[i][0], boxes[i][1])
             (w, h) = (boxes[i][2], boxes[i][3])
             color = [int(c) for c in colors[classIDs[i]]]
-            cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+            area = (x+w)*(y+h)
+            if area > 200000:
+                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
 
     return cv2.resize(img, (1280, 720))

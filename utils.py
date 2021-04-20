@@ -1,4 +1,4 @@
-from constants import COLOR_BOUNDARIES, SCOREBOARD_MEAN, OPEN_CLOSE_FRAMES
+from constants import SCOREBOARD_MEAN, REPLAY_TRANSCRIPTION, TRANSCRIPTION, OPEN_CLOSE_FRAMES
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,12 +23,32 @@ def show_image(img, window_title='Window'):
     cv2.waitKey(0)
 
 def evaluate_hit(result, frame_number):
-    return 1 if OPEN_CLOSE_FRAMES[frame_number-1] == result else 0
+    for event in TRANSCRIPTION:
+        if result == False:
+            if frame_number in range(event['from'], event['to']+1):
+                outcome = 'hit'
+                break
+            outcome = 'miss'
+        else:
+            if frame_number in range(event['from'], event['to']+1):
+                outcome = 'miss'
+                break
+            outcome = 'hit'
+    return outcome
 
-def count_misses(open_hits, close_hits):
+def evaluate_replay_hit(result, frame_number):
+    for replay in REPLAY_TRANSCRIPTION:
+        if result == True:
+            if frame_number in range(replay['from'], replay['to']+1):
+                outcome = 'hit'
+                break
+            outcome = 'miss'
+    return outcome
+
+def count_open_close_frames():
     open_frames = OPEN_CLOSE_FRAMES.count(False)
     close_frames = OPEN_CLOSE_FRAMES.count(True)
-    return open_frames - open_hits, close_frames - close_hits
+    return open_frames, close_frames
 
 def detect_scoreboard(image, debug=False):
     # 1. Cut frames to the top left

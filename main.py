@@ -1,9 +1,13 @@
-from functions import camera_detection, player_detection, replay_detection
-from utils import detect_skin, load_yolo, evaluate_hit, count_misses
 import argparse
-import random
-import cv2
 import pdb
+import random
+import time
+
+import cv2
+
+from constants import REPLAY_FRAMES
+from functions import camera_detection, player_detection, replay_detection
+from utils import count_open_close_frames, detect_skin, evaluate_hit, evaluate_replay_hit, load_yolo
 
 '''
 TODO se possível: 
@@ -29,6 +33,7 @@ frame_sequences = [1, 139, 1358, 1721, 2026, 2510]
 detect_movement = False
 
 if __name__ == '__main__':
+    t = time.time()
     video = cv2.VideoCapture('videos/cv-brager2016_Trim.mp4')
     frames = []
     last_frame = []
@@ -36,12 +41,17 @@ if __name__ == '__main__':
     net, classes, colors, layer_names = load_yolo()
     i = 0
     open_hits = 0
+    open_misses = 0
+    replay_hits = 0
+    replay_misses = 0
     close_hits = 0
+    close_misses = 0
     while video.isOpened():
         ret, frame = video.read()
         if ret == True:
             i += 1
             if i >= args.start_from:
+
                 if args.verbose: print('Playing video and detecting specifics... Frame {} - {}%'.format(i, round(i/number_of_frames * 100, 2)))
                 
                 if args.track_players:
@@ -51,17 +61,27 @@ if __name__ == '__main__':
                     if detect_movement:
                         frame = player_detection(frame, net, classes, colors, layer_names)
                 
-                close_camera = camera_detection(frame, debug=False)
+                close_camera = camera_detection(frame)
                 if close_camera:
                     final_frame = cv2.putText(frame, 'Close camera shot: Frame {}'.format(i), (int(frame.shape[1] * 0.65), int(frame.shape[0] * 0.9)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), thickness=2)
-                    close_hits += evaluate_hit(close_camera, i-1)
+                    if evaluate_hit(close_camera, i) == 'hit':
+                        close_hits += 1
+                    else:
+                        close_misses += 1
                 else:
                     final_frame = cv2.putText(frame, 'Open camera shot: Frame {}'.format(i), (int(frame.shape[1] * 0.65), int(frame.shape[0] * 0.9)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), thickness=2)
-                    open_hits += evaluate_hit(close_camera, i-1)
+                    if evaluate_hit(close_camera, i) == 'hit':
+                        open_hits += 1
+                    else:
+                        open_misses += 1
                 
                 replay = replay_detection(frame)
                 if replay:
                     final_frame = cv2.putText(final_frame, 'Replay', (int(frame.shape[1] * 0.65), int(frame.shape[0] * 0.85)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), thickness=2)
+                    if evaluate_replay_hit(replay, i) == 'hit':
+                        replay_hits += 1
+                    else:
+                        replay_misses += 1
 
                 if args.break_on_frame:
                     if i == args.break_on_frame: break
@@ -101,18 +121,23 @@ if __name__ == '__main__':
         if args.end_at:
             final_video = cv2.VideoWriter('tmp/brager2016_opencv_{}-{}.mp4'.format(args.start_from, args.end_at), cv2.VideoWriter_fourcc(*'avc1'), video.get(cv2.CAP_PROP_FPS), (frames[0].shape[1], frames[0].shape[0]))
         else:
-            final_video = cv2.VideoWriter('tmp/brager2016_opencv_{}.mp4'.format(args.start_from), cv2.VideoWriter_fourcc(*'avc1'), video.get(cv2.CAP_PROP_FPS), (frames[0].shape[1], frames[0].shape[0]))
+            final_video = cv2.VideoWriter('tmp/brager2016_opencva_{}.mp4'.format(args.start_from), cv2.VideoWriter_fourcc(*'avc1'), video.get(cv2.CAP_PROP_FPS), (frames[0].shape[1], frames[0].shape[0]))
         for video_frame in frames:
             final_video.write(video_frame)
         video.release()
+        t0 = time.time()
+        print('Time elapsed: {} seconds'.format(round(t0-t, 2)))
     if args.verbose:
-        open_misses, close_misses = count_misses(open_hits, close_hits)
-        open_precision = round(open_hits/(open_hits + open_misses) * 100, 2)
-        close_precision = round(close_hits/(close_hits + close_misses) * 100, 2)
+        open_precision = round(open_hits/(open_hits+open_misses) * 100, 2)
+        close_precision = round(close_hits/(close_hits+close_misses) * 100, 2)
+        replay_precision = round(replay_hits/REPLAY_FRAMES * 100, 2)
         print('Open hits: {}'.format(open_hits))
         print('Close hits: {}'.format(close_hits))
         print('Open misses: {}'.format(open_misses))
         print('Close misses: {}'.format(close_misses))
+        print('Replay hits: {}'.format(replay_hits))
+        print('Replay misses: {}'.format(replay_misses))
+        print('Replay precision: {}'.format(replay_precision))
         print('Open hit precision: {}'.format(open_precision))
         print('Close hit precision: {}'.format(close_precision))
-        print('Overall precision: {}'.format(round((open_precision + close_precision)/2, 2)))
+        print('Overall open/close precision: {}'.format(round((open_precision + close_precision)/2, 2)))

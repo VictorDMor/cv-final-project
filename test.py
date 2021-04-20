@@ -1,6 +1,6 @@
 import argparse
 import cv2
-from functions import camera_detection, player_movement
+from functions import camera_detection
 from utils import show_image, detect_scoreboard, detect_skin
 
 parser = argparse.ArgumentParser(description='Camera type detection')
@@ -21,9 +21,6 @@ if args.function == 'detect_scoreboard':
 
 if args.function == 'detect_skin':
     detect_skin(img, test=True)
-
-if args.function == 'player_movement':
-    player_movement(img1, img2)
 
 if args.function == 'camera_detection':
     camera_detection(img, debug=True)
